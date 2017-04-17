@@ -16,6 +16,9 @@ set_target_properties(Client PROPERTIES
     ${DEFAULT_PROJECT_OPTIONS}
     FOLDER "${IDE_FOLDER}"
 )
+target_include_directories(Client SYSTEM PRIVATE
+    ${DEFAULT_SYSTEM_INCLUDE_DIRECTORIES}
+)
 target_include_directories(Client PRIVATE
     ${DEFAULT_INCLUDE_DIRECTORIES}
     ${SFML_INCLUDE_DIR}

@@ -1,5 +1,5 @@
 set(SOURCES
-    Messages.hpp
+    Network.cpp
 )
 
 add_library(Common STATIC
@@ -10,6 +10,9 @@ add_library(LD38::Common ALIAS Common)
 set_target_properties(Common PROPERTIES
     ${DEFAULT_PROJECT_OPTIONS}
     FOLDER "${IDE_FOLDER}"
+)
+target_include_directories(Common SYSTEM PRIVATE
+    ${DEFAULT_SYSTEM_INCLUDE_DIRECTORIES}
 )
 target_include_directories(Common PRIVATE
     ${DEFAULT_INCLUDE_DIRECTORIES}

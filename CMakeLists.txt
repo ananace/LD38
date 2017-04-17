@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
+cmake_policy(SET CMP0063 NEW) # Honor visibility properties for all target types
+
 project(LD38
     LANGUAGES CXX
     VERSION 0.0.0

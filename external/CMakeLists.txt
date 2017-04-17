@@ -54,7 +54,17 @@ target_link_libraries(libyojimbo PRIVATE
     >
 )
 target_compile_options(libyojimbo PRIVATE
-    ${DEFAULT_COMPILE_OPTIONS}
+    $<$<PLATFORM_ID:Windows>:
+        /MP
+        /FC
+        $<$<CONFIG:Release>:
+            /Ox
+            /Gw
+            /GL
+            /GF
+        >
+    >
+#   ${DEFAULT_COMPILE_OPTIONS}
 )
 target_link_libraries(libyojimbo PRIVATE
     ${DEFAULT_LINKER_OPTIONS}
