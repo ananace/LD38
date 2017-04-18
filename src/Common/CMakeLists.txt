@@ -1,6 +1,15 @@
 set(SOURCES
     Network.cpp
+    ScriptException.cpp
+    ScriptManager.cpp
+
+    scriptnetwork/scriptnetwork.cpp
 )
+
+source_group("Header files\\" REGULAR_EXPRESSION "[^./]+.(hpp|inl)")
+source_group("Source files\\" REGULAR_EXPRESSION "[^./]+.cpp")
+source_group("Header files\\Game" REGULAR_EXPRESSION "scriptnetwork/[^./]+.(hpp|inl)")
+source_group("Source files\\Game" REGULAR_EXPRESSION "scriptnetwork/[^./]+.cpp")
 
 add_library(Common STATIC
     ${SOURCES}

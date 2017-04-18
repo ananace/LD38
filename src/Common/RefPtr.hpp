@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 
 template<typename T>
 class RefPtr
@@ -83,10 +84,8 @@ public:
     T& operator*() const { return *m_refPtr; }
     T* operator->() const { return m_refPtr; }
 
-    T* Get()
+    T* Get() const
     {
-        if (m_refPtr)
-            m_refPtr->AddRef();
         return m_refPtr;
     }
     void Reset(T* newPtr = nullptr)
@@ -98,6 +97,12 @@ public:
             m_refPtr->AddRef();
         if (tmp)
             tmp->Release();
+    }
+    T* Release()
+    {
+        auto tmp = m_refPtr;
+        m_refPtr = nullptr;
+        return tmp;
     }
 
     bool operator!() const { return !m_refPtr; }
