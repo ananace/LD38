@@ -13,6 +13,7 @@
 #endif
 
 namespace sf { class InputStream; }
+namespace Network { class ScriptMsg; }
 
 namespace Script
 {
@@ -25,6 +26,14 @@ public:
         kManagerUserId = 0x4567,
     };
 
+    enum ScriptType
+    {
+        Script_Text,
+        Script_Bytecode,
+
+        Script_Autodetect
+    };
+
     Manager();
     ~Manager();
 
@@ -34,6 +43,11 @@ public:
     const asIScriptEngine* GetEngine() const { return m_engine.Get(); }
 
     void Initialize();
+
+    bool LoadScript(const std::string& file);
+    bool LoadScript(const std::string& file, const void* fileData, size_t length, ScriptType type = Script_Autodetect);
+    bool LoadScript(const Network::ScriptMsg& script);
+    bool UnloadScript(const std::string& file);
 
 private:
     RefPtr<asIScriptEngine> m_engine;
