@@ -1,17 +1,17 @@
 #pragma once
 
-#include <yojimbo_message.h>
+#include <libyojimbo/yojimbo_message.h>
 #include <type_traits>
 
 template<typename T>
 class MessagePtr
 {
-private:
+public:
     static_assert(std::is_base_of<yojimbo::Message, T>::value,
                   "Type must be a libyojimbo message");
 
     typedef T message_t;
-    typedef yojimbo::MessageFactory* factory_t;
+    typedef yojimbo::MessageFactory factory_t;
 
     MessagePtr()
         : m_messagePtr(nullptr)
@@ -35,8 +35,8 @@ private:
         , m_factoryPtr(copy.m_factoryPtr)
     { AddRef(); }
     MessagePtr(MessagePtr&& move)
-        : m_messagePtr(std::move(copy.m_messagePtr))
-        , m_factoryPtr(std::move(copy.m_factoryPtr))
+        : m_messagePtr(std::move(move.m_messagePtr))
+        , m_factoryPtr(std::move(move.m_factoryPtr))
     { }
     ~MessagePtr()
     {
@@ -109,7 +109,7 @@ private:
     bool operator!=(const MessagePtr& rhs) const
     { return m_messagePtr != rhs.m_messagePtr; }
     bool operator!=(message_t* rhs) const
-    { return m_messagePtr != rhs.m_messagePtr; }
+    { return m_messagePtr != rhs; }
     friend bool operator!=(const message_t* lhs, const MessagePtr& rhs)
     { return lhs != rhs.m_messagePtr; }
 
