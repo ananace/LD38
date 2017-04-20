@@ -11,6 +11,8 @@ public:
 
     GameServer& operator=(const GameServer&) = delete;
 
+    void Update();
+
 private:
     Script::Manager m_scripts;
 };

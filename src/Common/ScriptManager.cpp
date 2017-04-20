@@ -101,6 +101,9 @@ bool Manager::LoadScript(const std::string& file, const void* fileData, size_t l
     }
 
     // TODO:
+    // - Hot-reload
+    // - Load/Reload events
+    // - Better error reporting
 
     auto* mod = m_engine->GetModule(file.c_str(), asGM_ALWAYS_CREATE); if (!mod) return false;
 
@@ -121,7 +124,7 @@ bool Manager::LoadScript(const std::string& file, const void* fileData, size_t l
 
 bool Manager::LoadScript(const Network::ScriptMsg& script)
 {
-    return LoadScript(script.ScriptName, const_cast<Network::ScriptMsg&>(script).GetBlockData(), script.GetBlockSize(), Script_Bytecode);
+    return LoadScript(script.ScriptName, script.GetBlockData(), script.GetBlockSize(), Script_Bytecode);
 }
 
 bool Manager::UnloadScript(const std::string& file)

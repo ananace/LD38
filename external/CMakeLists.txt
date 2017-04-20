@@ -1,5 +1,45 @@
 set(IDE_FOLDER "External")
 
+set(ASADDON_SOURCES
+    as_addons/contextmgr/contextmgr.cpp
+    as_addons/datetime/datetime.cpp
+    as_addons/debugger/debugger.cpp
+    as_addons/scriptany/scriptany.cpp
+    as_addons/scriptarray/scriptarray.cpp
+    as_addons/scriptbuilder/scriptbuilder.cpp
+    as_addons/scriptdictionary/scriptdictionary.cpp
+    as_addons/scriptgrid/scriptgrid.cpp
+    as_addons/scripthandle/scripthandle.cpp
+    as_addons/scripthelper/scripthelper.cpp
+    as_addons/scriptmath/scriptmath.cpp
+    as_addons/scriptmath/scriptmathcomplex.cpp
+    as_addons/scriptstdstring/scriptstdstring.cpp
+    as_addons/scriptstdstring/scriptstdstring_utils.cpp
+    as_addons/serializer/serializer.cpp
+    as_addons/weakref/weakref.cpp
+)
+
+add_library(as_addons STATIC
+    ${ASADDON_SOURCES}
+)
+add_library(LD38::External::as_addons ALIAS as_addons)
+
+set_target_properties(as_addons PROPERTIES
+    ${DEFAULT_PROJECT_OPTIONS}
+    FOLDER "${IDE_FOLDER}"
+)
+target_include_directories(as_addons PRIVATE
+    ${DEFAULT_INCLUDE_DIRECTORIES}
+    ${Angelscript_INCLUDE_DIRS}
+)
+target_link_libraries(as_addons PRIVATE
+    ${DEFAULT_LIBRARIES}
+    ${Angelscript_LIBRARIES}
+)
+target_link_libraries(as_addons PRIVATE
+    ${DEFAULT_LINKER_OPTIONS}
+)
+
 set(YOJIMBO_SOURCES
     libyojimbo/yojimbo.cpp
     libyojimbo/yojimbo_address.cpp

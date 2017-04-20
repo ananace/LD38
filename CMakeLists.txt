@@ -22,5 +22,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${LIB_PATH}")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(IDE_FOLDER "")
 
+find_package(Angelscript REQUIRED)
+
 add_subdirectory(external)
 add_subdirectory(src)

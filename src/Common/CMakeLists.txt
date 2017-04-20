@@ -29,6 +29,7 @@ target_include_directories(Common PRIVATE
 target_link_libraries(Common PRIVATE
     ${DEFAULT_LIBRARIES}
     LD38::External::libyojimbo
+    LD38::External::as_addons
 )
 target_compile_options(Common PRIVATE
     ${DEFAULT_COMPILE_OPTIONS}
