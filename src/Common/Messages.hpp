@@ -97,7 +97,6 @@ public:
     YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS()
 };
 
-
 enum MessageTypes
 {
     Message_Hello = HelloMsg::Type,

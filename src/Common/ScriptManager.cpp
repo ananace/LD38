@@ -1,9 +1,27 @@
 #include "ScriptManager.hpp"
 #include "Messages.hpp"
 
+#include <as_addons/contextmgr/contextmgr.h>
+#include <as_addons/debugger/debugger.h>
+#include <as_addons/datetime/datetime.h>
+#include <as_addons/scriptany/scriptany.h>
+#include <as_addons/scriptarray/scriptarray.h>
+#include <as_addons/scriptbuilder/scriptbuilder.h>
+#include <as_addons/scriptdictionary/scriptdictionary.h>
+#include <as_addons/scriptgrid/scriptgrid.h>
+#include <as_addons/scripthandle/scripthandle.h>
+#include <as_addons/scripthelper/scripthelper.h>
+#include <as_addons/scriptmath/scriptmath.h>
+#include <as_addons/scriptmath/scriptmathcomplex.h>
+#include <as_addons/scriptstdstring/scriptstdstring.h>
+#include <as_addons/serializer/serializer.h>
+#include <as_addons/weakref/weakref.h>
+
 #include <iostream>
 #include <fstream>
 #include <vector>
+
+#include <ctime>
 
 using namespace Script;
 
@@ -30,6 +48,7 @@ namespace
 Manager::Manager()
     : m_engine(asCreateScriptEngine(ANGELSCRIPT_VERSION))
 {
+    m_contextMgr.SetGetTimeCallback([]() -> asUINT { return clock(); });
 }
 
 Manager::~Manager()
@@ -41,6 +60,20 @@ void Manager::Initialize()
 {
     m_engine->SetUserData(this, kManagerUserId);
     m_engine->SetMessageCallback(asFUNCTION(scriptMessage), nullptr, asCALL_CDECL);
+
+    RegisterStdString(m_engine.Get());
+    RegisterScriptAny(m_engine.Get());
+    RegisterScriptArray(m_engine.Get(), true);
+    RegisterScriptDateTime(m_engine.Get());
+    RegisterScriptDictionary(m_engine.Get());
+    RegisterScriptGrid(m_engine.Get());
+    RegisterScriptHandle(m_engine.Get());
+    RegisterScriptMath(m_engine.Get());
+    RegisterScriptMathComplex(m_engine.Get());
+    RegisterStdStringUtils(m_engine.Get());
+
+    m_contextMgr.RegisterThreadSupport(m_engine.Get());
+    m_contextMgr.RegisterCoRoutineSupport(m_engine.Get());
 }
 
 bool Manager::LoadScript(const std::string& file)
@@ -69,10 +102,19 @@ bool Manager::LoadScript(const std::string& file, const void* fileData, size_t l
 
     // TODO:
 
-    int r;
     auto* mod = m_engine->GetModule(file.c_str(), asGM_ALWAYS_CREATE); if (!mod) return false;
-    r = mod->AddScriptSection(file.c_str(), reinterpret_cast<const char*>(fileData), length); if (r <= 0) return false;
-    r = mod->Build(); if (r <= 0) return false;
+
+    if (type == Script_Text)
+    {
+        AS_SOFTASSERT(mod->AddScriptSection(file.c_str(), reinterpret_cast<const char*>(fileData), length));
+        AS_SOFTASSERT(mod->Build());
+    }
+    else
+    {
+        auto store = BytecodeStore(reinterpret_cast<const char*>(fileData), length);
+        AS_SOFTASSERT(mod->LoadByteCode(&store, nullptr));
+        AS_SOFTASSERT(mod->Build());
+    }
 
     return true;
 }

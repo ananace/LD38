@@ -1,6 +1,11 @@
 set(SOURCES
     main.cpp
+
+    GameServer.cpp
 )
+
+source_group("Header files\\" REGULAR_EXPRESSION "[^./]+.(hpp|inl)")
+source_group("Source files\\" REGULAR_EXPRESSION "[^./]+.cpp")
 
 add_executable(Server
     ${SOURCES}

@@ -5,7 +5,12 @@ find_package(SFML 2
 
 set(SOURCES
     main.cpp
+
+    Application.cpp
 )
+
+source_group("Header files\\" REGULAR_EXPRESSION "[^./]+.(hpp|inl)")
+source_group("Source files\\" REGULAR_EXPRESSION "[^./]+.cpp")
 
 add_executable(Client
     ${SOURCES}

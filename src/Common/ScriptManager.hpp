@@ -3,6 +3,7 @@
 #include "RefPtr.hpp"
 
 #include <angelscript.h>
+#include <as_addons/contextmgr/contextmgr.h>
 
 #ifndef NDEBUG
 #include "ScriptException.hpp"
@@ -11,12 +12,47 @@
 #else
 #define AS_ASSERT(f) f
 #endif
+#define AS_SOFTASSERT(f) if ((f) <= 0) return false;
 
 namespace sf { class InputStream; }
 namespace Network { class ScriptMsg; }
 
 namespace Script
 {
+
+class BytecodeStore : public asIBinaryStream
+{
+public:
+    BytecodeStore() : mTellg(0) { }
+    BytecodeStore(const char* data, size_t len) :
+        mTellg(0)
+    {
+        mStore.assign(data, data + len);
+    }
+
+    void Read(void *ptr, asUINT size)
+    {
+        char* data = reinterpret_cast<char*>(ptr);
+
+        for (uint32_t i = 0; i < size; ++i)
+        {
+            data[i] = mStore[mTellg + i];
+        }
+
+        mTellg += size;
+    }
+    void Write(const void *ptr, asUINT size)
+    {
+        const char* data = reinterpret_cast<const char*>(ptr);
+
+        for (uint32_t i = 0; i < size; ++i)
+            mStore.push_back(data[i]);
+    }
+
+private:
+    std::vector<char> mStore;
+    size_t mTellg;
+};
 
 class Manager
 {
@@ -41,6 +77,8 @@ public:
     const asIScriptEngine* operator->() const { return m_engine.Get(); }
     asIScriptEngine* GetEngine() { return m_engine.Get(); }
     const asIScriptEngine* GetEngine() const { return m_engine.Get(); }
+    CContextMgr* GetContextMgr() { return &m_contextMgr; }
+    const CContextMgr* GetContextMgr() const { return &m_contextMgr; }
 
     void Initialize();
 
@@ -51,6 +89,7 @@ public:
 
 private:
     RefPtr<asIScriptEngine> m_engine;
+    CContextMgr m_contextMgr;
 };
 
 }
