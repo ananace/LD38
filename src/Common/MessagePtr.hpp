@@ -3,6 +3,8 @@
 #include <libyojimbo/yojimbo_message.h>
 #include <type_traits>
 
+namespace Network { class ServerCommon; class ClientCommon; }
+
 template<typename T>
 class MessagePtr
 {
@@ -98,6 +100,7 @@ public:
 
     bool operator!() const { return !m_messagePtr; }
     bool IsValid() const { return m_messagePtr; }
+    bool BelongsTo(const yojimbo::MessageFactory& factory) const { return m_factoryPtr == &factory; }
 
     bool operator==(const MessagePtr& rhs) const
     { return m_messagePtr == rhs.m_messagePtr; }
@@ -129,7 +132,6 @@ public:
         return IsValid() ? m_messagePtr : nullptr;
     }
 
-protected:
     void AddRef()
     {
         assert(m_factoryPtr);
