@@ -41,6 +41,7 @@ target_link_libraries(as_addons PRIVATE
 )
 
 set(YOJIMBO_SOURCES
+    libyojimbo/tlsf/tlsf.c
     libyojimbo/yojimbo.cpp
     libyojimbo/yojimbo_address.cpp
     libyojimbo/yojimbo_allocator.cpp
@@ -66,6 +67,9 @@ add_library(libyojimbo STATIC
 )
 add_library(LD38::External::libyojimbo ALIAS libyojimbo)
 
+set_source_files_properties(${YOJIMBO_SOURCES} PROPERTIES
+    LANGUAGE CXX
+)
 set_target_properties(libyojimbo PROPERTIES
     ${DEFAULT_PROJECT_OPTIONS}
     FOLDER "${IDE_FOLDER}"
@@ -73,26 +77,48 @@ set_target_properties(libyojimbo PROPERTIES
 target_include_directories(libyojimbo PRIVATE
     ${DEFAULT_INCLUDE_DIRECTORIES}
     $<$<PLATFORM_ID:Windows>:
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows"
+        "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows"
     >
 )
 target_link_libraries(libyojimbo PRIVATE
     ${DEFAULT_LIBRARIES}
-    $<$<PLATFORM_ID:Windows>:
-    $<$<OR:$<CONFIG:Release>,$<CONFIG:MinSizeRel>,$<CONFIG:RelWithDebInfo>>:
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedcrypto-release.lib"
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedtls-release.lib"
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedx509-release.lib"
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/sodium-release.lib"
-    >
-    $<$<CONFIG:Debug>:
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedcrypto-debug.lib"
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedtls-debug.lib"
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedx509-debug.lib"
-    "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/sodium-debug.lib"
-    >
-    >
 )
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+    target_link_libraries(libyojimbo PRIVATE
+        $<$<OR:$<CONFIG:Release>,$<CONFIG:MinSizeRel>,$<CONFIG:RelWithDebInfo>>:
+            "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedcrypto-release.lib"
+            "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedtls-release.lib"
+            "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedx509-release.lib"
+            "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/sodium-release.lib"
+        >
+        $<$<CONFIG:Debug>:
+            "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedcrypto-debug.lib"
+            "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedtls-debug.lib"
+            "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/mbedx509-debug.lib"
+            "${CMAKE_CURRENT_SOURCE_DIR}/libyojimbo/windows/sodium-debug.lib"
+        >
+    )
+else()
+    find_library(SODIUM_LIBRARY sodium)
+    find_path(SODIUM_INCLUDE_DIR sodium/core.h)
+    find_path(MBEDTLS_INCLUDE_DIR mbedtls/config.h)
+    find_library(MBEDTLS_LIBRARY mbedtls)
+    find_library(MBEDCRYPTO_LIBRARY mbedcrypto)
+    find_library(MBEDX509_LIBRARY mbedx509)
+
+    target_link_libraries(libyojimbo PRIVATE
+        ${SODIUM_LIBRARY}
+        ${MBEDTLS_LIBRARY}
+        ${MBEDCRYPTO_LIBRARY}
+        ${MBEDX509_LIBRARY}
+    )
+    target_include_directories(libyojimbo PRIVATE
+        ${SODIUM_INCLUDE_DIR}
+        ${MBEDTLS_INCLUDE_DIR}
+    )
+endif()
+
 target_compile_options(libyojimbo PRIVATE
     $<$<PLATFORM_ID:Windows>:
         /MP

@@ -2,4 +2,5 @@
 
 void GameServer::Update()
 {
+    ServerCommon::Update();
 }

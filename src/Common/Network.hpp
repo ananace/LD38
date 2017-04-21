@@ -37,7 +37,7 @@ public:
     virtual void Update() = 0;
 
 protected:
-    virtual yojimbo::MessageFactory* CreateMessageFactory(yojimbo::Allocator& aAllocator) = 0;
+    virtual yojimbo::MessageFactory* CreateMessageFactory(yojimbo::Allocator& allocator) = 0;
 
     static double GetTime();
 
@@ -117,7 +117,7 @@ public:
         Host(yojimbo::Address(host.c_str(), port));
     }
     void Stop();
-    void Update();
+    virtual void Update();
 
     template<typename T>
     MessagePtr<T> CreateMessage(int connectionId = 0)
@@ -174,6 +174,9 @@ private:
         }
         virtual void OnClientError(int client, yojimbo::ServerClientError error) {
             m_server.OnError(client, error);
+        }
+        virtual yojimbo::MessageFactory* CreateMessageFactory(yojimbo::Allocator & allocator, yojimbo::ServerResourceType /*type*/, int /*clientIndex*/) {
+            return m_server.CreateMessageFactory(allocator);
         }
 
     private:
